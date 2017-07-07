@@ -9,11 +9,11 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-	public float speed;
-	public int life;
-	public float maxSpeed;
+	public float Speed;
+	public int Life;
+	public float MaxSpeed;
 	public bool IsInvul;
-	Vector3 playerPosition;
+	Vector3 _playerMovementDirection;
 	
 	// Use this for initialization
 	void Start () {
@@ -22,8 +22,8 @@ public class PlayerController : MonoBehaviour
 	
 	// Update is called once per frame
 	void Update () {
-		playerPosition = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
-		transform.position += playerPosition * speed * Time.deltaTime;
+		_playerMovementDirection = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
+		transform.position += _playerMovementDirection * Speed * Time.deltaTime;
 		
 		SpeedTransform();
 
@@ -31,9 +31,9 @@ public class PlayerController : MonoBehaviour
 
 	void SpeedTransform()
 	{
-		if (speed <= maxSpeed)
+		if (Speed <= MaxSpeed)
 		{
-			speed += 0.1f;
+			Speed += 0.1f;
 		}
 	}
 
@@ -54,8 +54,8 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator Invul()
 	{
-		life -= 1;
-		if (life <= 0)
+		Life -= 1;
+		if (Life <= 0)
 		{
 			ChangeColor(Color.red);
 			SceneManager.LoadScene(("GameOver"));
