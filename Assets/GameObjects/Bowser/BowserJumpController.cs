@@ -57,9 +57,4 @@ public class BowserJumpController : MonoBehaviour
 	{
 		_direction.x = -_direction.x;
 	}
-
-	private void ChangeDirectionY()
-	{
-		_direction.y = -_direction.y;
-	}
 }
