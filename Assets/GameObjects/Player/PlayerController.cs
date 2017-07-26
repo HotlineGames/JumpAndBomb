@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-	public const float DefaultJetPackFuel = 2;
+	public float DefaultJetPackFuel = 20;
 
 	//Vector3 _playerMovementDirection;
 
-	private Rigidbody _rigidBody;
+	private Rigidbody2D _rigidBody;
 	public bool IsInvul;
 	public float JetPackFuel;
 	public int Life;
@@ -17,11 +17,13 @@ public class PlayerController : MonoBehaviour
 	public float MaxSpeedY;
 	public float Speed;
 	public float JumpForce;
+	public bool IsJumping;
+	public float Gravity;
 
 	// Use this for initialization
 	private void Start()
 	{
-		_rigidBody = GetComponent<Rigidbody>();
+		_rigidBody = GetComponent<Rigidbody2D>();
 		ChangeColor(Color.black);
 	}
 
@@ -30,13 +32,14 @@ public class PlayerController : MonoBehaviour
 	{
 		var input = GetInput();
 
+		var desiredMove = new Vector3(input.x, input.y);
 		var anyInput = Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon;
+		var pressesUp = desiredMove.y > 0;
+		var hasJetPackFuel = JetPackFuel > float.Epsilon;
 
 		var velocity = _rigidBody.velocity;
 		if (anyInput)
 		{
-			var desiredMove = new Vector3(input.x, input.y);
-
 			desiredMove = desiredMove * Speed;
 
 			var isBelowMaxHorizontalSpeed = Math.Abs(velocity.x) < MaxSpeedX;
@@ -44,40 +47,63 @@ public class PlayerController : MonoBehaviour
 			var isAgainstCurrentDirection = desiredMove.x * velocity.x < -Mathf.Epsilon;
 
 			if (isBelowMaxHorizontalSpeed || isAgainstCurrentDirection)
-					_rigidBody.velocity = velocity + new Vector3(desiredMove.x * Speed, 0);
-				
+					_rigidBody.velocity = velocity + new Vector2(desiredMove.x * Speed, 0);
 
-			if (desiredMove.y > 0)
-				if (JetPackFuel > 0.0f)
-				{
-					_rigidBody.AddForce(new Vector3(0, desiredMove.y * JumpForce), ForceMode.VelocityChange);
-					JetPackFuel = JetPackFuel - 0.1f;
-				}
+
+			if (pressesUp && hasJetPackFuel)
+			{
+				IsJumping = true;
+				_rigidBody.velocity += new Vector2(0, JumpForce);
+				JetPackFuel = JetPackFuel - 0.1f;
+			}
 		}
-		else if(Mathf.Abs(velocity.x) > Mathf.Epsilon)
+		else
 		{
-			var f = 0.1f;
-
-			var antiDirection = Mathf.Sign(velocity.x) * -1;
-
-			var newVelocity = velocity + new Vector3(f * antiDirection, 0);
-
-			var wouldChangeDirection = velocity.x * newVelocity.x < -Mathf.Epsilon;
-			if (wouldChangeDirection)
+			if (Mathf.Abs(velocity.x) > Mathf.Epsilon)
 			{
-				_rigidBody.velocity = new Vector3(0, velocity.y);
+				HandleHorizontalBreaking(velocity);
 			}
-			else
-			{
-				_rigidBody.velocity = newVelocity;
-			}
-			
+		}
+
+		if (!pressesUp && IsJumping)
+			JetPackFuel = 0;
+
+		_rigidBody.velocity += new Vector2(0, -Gravity);
+	}
+
+	void OnDrawGizmos()
+	{
+		if (_rigidBody != null)
+		{
+			Gizmos.DrawLine(_rigidBody.position, _rigidBody.position + _rigidBody.velocity);
+		}
+
+		
+	}
+
+	private void HandleHorizontalBreaking(Vector3 velocity)
+	{
+		var f = 0.1f;
+
+		var antiDirection = Mathf.Sign(velocity.x) * -1;
+
+		var newVelocity = velocity + new Vector3(f * antiDirection, 0);
+
+		var wouldChangeDirection = velocity.x * newVelocity.x < -Mathf.Epsilon;
+		if (wouldChangeDirection)
+		{
+			_rigidBody.velocity = new Vector3(0, velocity.y);
+		}
+		else
+		{
+			_rigidBody.velocity = newVelocity;
 		}
 	}
 
-	public void ResetFuel(float fuel = DefaultJetPackFuel)
+	public void ResetFuel()
 	{
-		JetPackFuel = fuel;
+		JetPackFuel = DefaultJetPackFuel;
+		IsJumping = false;
 	}
 
 	private static Vector2 GetInput()
@@ -133,10 +159,9 @@ public class PlayerController : MonoBehaviour
 	}
 
 
-	private void OnCollisionEnter(Collision collision)
+	private void OnCollisionEnter2D(Collision collision)
 	{
 		var isEnemy = collision.gameObject.CompareTag("Monster");
-
 
 		if (isEnemy)
 		{
