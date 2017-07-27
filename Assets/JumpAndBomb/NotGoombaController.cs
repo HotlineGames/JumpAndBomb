@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
@@ -8,34 +9,61 @@ namespace Assets.JumpAndBomb
 {
 	public class NotGoombaController : MonoBehaviour, IReversable
 	{
-		private Animator anim;
+		private Animator _anim;
 		public float Speed;
+		public float JumpSpeed;
+		private Rigidbody rigidbody;
+		private bool _inAnimation;
+		public float JumpCd;
 		public void Reverse()
 		{
-			Speed  *= -1;
-			transform.Rotate(new Vector3(0,1,0), 180);
+			Speed *= -1;
+			rigidbody.velocity = new Vector3(Speed, rigidbody.velocity.y);
+			transform.Rotate(new Vector3(0, 1, 0), 180);
 		}
 		
 		// Use this for initialization
 		void Start ()
 		{
-			anim = GetComponent<Animator>();
-			anim.SetBool("move", true);
+			_anim = GetComponent<Animator>();
+			rigidbody = GetComponent<Rigidbody>();
+			_inAnimation = false;
 		}
 		// Update is called once per frame
 		void Update ()
 		{
-			Vector3 newPosition = transform.position;
-			GetComponentInChildren<Rigidbody>().MovePosition(newPosition + new Vector3(-Speed, 0));
-			
-
+			Jump();
 		}
 
-		void OnAnimatorMove()
+		void Jump()
 		{
+			if (_anim.GetCurrentAnimatorStateInfo(0).IsName("Move") && !_anim.IsInTransition(0) && _anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.2f && !_inAnimation)
+			{
+
+				rigidbody.velocity = new Vector3(Speed, JumpSpeed);
+				//print(transform.GetChild(1).transform.GetChild(0).transform.position.y);
+				//float y = transform.GetChild(1).transform.GetChild(0).transform.position.y;
+				//Vector3 newPosition = transform.position;
+				//newPosition.x += -Speed * Time.deltaTime;
+				//newPosition.y += Speed * Time.deltaTime;
+				//transform.position = newPosition;
+				//newPosition.y = y * Time.deltaTime;
+				//GetComponentInChildren<Rigidbody>().MovePosition(newPosition + new Vector3(0, y));
+				StartCoroutine(JumpRoutine()); 
+				
+			}
 			
 		}
 
+		IEnumerator JumpRoutine()
+		{
+			_inAnimation = true;
+			_anim.SetBool("JumpAvailable", false);
+			yield return new WaitForSeconds(JumpCd);
+			_inAnimation = false;
+			_anim.SetBool("JumpAvailable", true);
+
+		}
 		void OnTriggerEnter(Collider other)
 		{
 			if (other.gameObject.CompareTag("Kill"))
@@ -53,7 +81,7 @@ namespace Assets.JumpAndBomb
 				ContactPoint contact = collision.contacts[0];
 				if (contact.normal.y == -1)
 				{
-					anim.SetBool("move", false);
+					_anim.SetBool("Move", false);
 					
 				}
 			}

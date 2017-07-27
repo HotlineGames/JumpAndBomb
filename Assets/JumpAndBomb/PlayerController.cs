@@ -9,30 +9,128 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-	public float speed;
-	public int life;
-	public float maxSpeed;
+	public float Speed;
+	public int Life;
+	public float MaxSpeed;
 	public bool IsInvul;
-	Vector3 playerPosition;
-	
+	public int JumpCount;
+
+	private bool IsMoving;
+	private bool IsJumping;
+	private bool IsStanding;
+	private bool IsFalling;
+	private bool HasFuel;
+
+	private Rigidbody _rig;
+	Vector3 _playerPosition;
+
 	// Use this for initialization
 	void Start () {
-		ChangeColor(Color.black); 
+		ChangeColor(Color.black);
+		_rig = GetComponent<Rigidbody>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		playerPosition = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
-		transform.position += playerPosition * speed * Time.deltaTime;
 		
-		SpeedTransform();
+		Move();
 	}
 
-	void SpeedTransform()
+	void Move()
 	{
-		if (speed <= maxSpeed)
+		//_playerPosition = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
+		//transform.position += _playerPosition * Speed * Time.deltaTime;
+		float moveVertically = Input.GetAxis("Horizontal");
+		float moveHorizontally = Input.GetAxis("Vertical");
+
+		if(moveVertically == 0.0f)
 		{
-			speed += 0.1f;
+			IsStanding = true;
+		}
+		if ((moveHorizontally > 0f || moveVertically > 0f) && _rig.velocity.x > 0 || _rig.velocity.y > 0)
+		{
+			IsMoving = true;
+		}
+		else
+		{
+			IsMoving = false;
+		}
+		if (_rig.velocity.y > 0)
+		{
+			IsJumping = true;
+			JumpCount=0;
+			StartCoroutine(FuelCountdown());
+		}
+		if (_rig.velocity.y < 0f)
+		{
+			IsFalling = true;
+			IsJumping = false;
+		}
+		else
+		{
+			IsFalling = false;
+		}
+		if (JumpCount > 0)
+		{
+			HasFuel = true;
+		}
+		if (_rig.velocity.y == 0)
+		{
+			JumpCount = 1;
+		}
+
+		if (moveHorizontally > 0 && HasFuel)
+		{
+			Vector3 movement = new Vector3(0.0f, moveHorizontally * Speed, 0.0f);
+			_rig.velocity = movement;
+		}
+		if (moveVertically > 0 || moveVertically < 0)
+		{
+			Vector3 movement = new Vector3(moveVertically * Speed, _rig.velocity.y, 0.0f);
+			_rig.velocity = movement;
+		}
+
+		
+
+
+		if (IsMoving) print("isMoving:   " + IsMoving);
+		if (IsFalling) print("isFalling:   " + IsFalling);
+		if (IsJumping) print("isJumping:   " + IsJumping);
+
+
+		//if(!(moveHorizontally > 0f) && JumpCount <= 0)
+		//	{
+		//		moveHorizontally = 0.0f;
+		//	}
+
+		//if (moveHorizontally != 0f)
+		//{
+		//	Vector3 movement = new Vector3(0.0f, moveHorizontally * Speed, 0.0f);
+		//	_rig.velocity = movement;
+		//	JumpCount--;
+		//}
+		//if (moveVertically != 0f)
+		//{
+		//	Vector3 movement = new Vector3(moveVertically * Speed, 0.0f, 0.0f);
+		//	_rig.velocity = movement;
+		//	SpeedTransform(0.1f);
+		//}
+		//else
+		//{
+		//	if (Speed > 2) SpeedTransform(-0.1f);
+		//}
+	}
+
+	IEnumerator FuelCountdown()
+	{
+		yield return new WaitForSeconds(1);
+		HasFuel = false;
+	}
+	void SpeedTransform(float velocity)
+	{
+		if (Speed <= MaxSpeed)
+		{
+			Speed += velocity;
 		}
 	}
 
@@ -53,8 +151,8 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator Invul()
 	{
-		life -= 1;
-		if (life <= 0)
+		Life -= 1;
+		if (Life <= 0)
 		{
 			ChangeColor(Color.red);
 			SceneManager.LoadScene(("GameOver"));
@@ -85,7 +183,6 @@ public class PlayerController : MonoBehaviour
 	{
 		
 		var isEnemy = collision.gameObject.CompareTag("Monster");
-		
 
 		if (isEnemy)
 		{
