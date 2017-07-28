@@ -13,13 +13,15 @@ public class PlayerController : MonoBehaviour
 	public int Life;
 	public float MaxSpeed;
 	public bool IsInvul;
-	public int JumpCount;
+	public bool CanJump;
 
 	private bool IsMoving;
 	private bool IsJumping;
 	private bool IsStanding;
 	private bool IsFalling;
 	private bool HasFuel;
+
+	public float velocity;
 
 	private Rigidbody _rig;
 	Vector3 _playerPosition;
@@ -31,8 +33,10 @@ public class PlayerController : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void FixedUpdate ()
+	{
+
+		velocity = _rig.velocity.y;
 		Move();
 	}
 
@@ -58,25 +62,26 @@ public class PlayerController : MonoBehaviour
 		if (_rig.velocity.y > 0)
 		{
 			IsJumping = true;
-			JumpCount=0;
+			CanJump = false;
 			StartCoroutine(FuelCountdown());
 		}
-		if (_rig.velocity.y < 0f)
+		if (_rig.velocity.y < -1)
 		{
 			IsFalling = true;
 			IsJumping = false;
+			CanJump = false;
 		}
 		else
 		{
 			IsFalling = false;
 		}
-		if (JumpCount > 0)
+		if (CanJump)
 		{
 			HasFuel = true;
 		}
 		if (_rig.velocity.y == 0)
 		{
-			JumpCount = 1;
+			CanJump = true;
 		}
 
 		if (moveHorizontally > 0 && HasFuel)
@@ -90,15 +95,21 @@ public class PlayerController : MonoBehaviour
 			_rig.velocity = movement;
 		}
 
-		
 
-
+		if (IsMoving)
+		{
+			SpeedTransform(0.1f);
+		}
+		else
+		{
+			if(Speed > 3) SpeedTransform(-0.1f);
+		}
 		if (IsMoving) print("isMoving:   " + IsMoving);
 		if (IsFalling) print("isFalling:   " + IsFalling);
 		if (IsJumping) print("isJumping:   " + IsJumping);
 
 
-		//if(!(moveHorizontally > 0f) && JumpCount <= 0)
+		//if(!(moveHorizontally > 0f) && CanJump <= 0)
 		//	{
 		//		moveHorizontally = 0.0f;
 		//	}
@@ -107,7 +118,7 @@ public class PlayerController : MonoBehaviour
 		//{
 		//	Vector3 movement = new Vector3(0.0f, moveHorizontally * Speed, 0.0f);
 		//	_rig.velocity = movement;
-		//	JumpCount--;
+		//	CanJump--;
 		//}
 		//if (moveVertically != 0f)
 		//{
@@ -123,14 +134,18 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator FuelCountdown()
 	{
-		yield return new WaitForSeconds(1);
+		yield return new WaitForSeconds(0.3f);
 		HasFuel = false;
 	}
 	void SpeedTransform(float velocity)
 	{
-		if (Speed <= MaxSpeed)
+		if (Speed <= MaxSpeed && Speed >= 3)
 		{
 			Speed += velocity;
+		}
+		else
+		{
+			Speed = 3;
 		}
 	}
 
@@ -181,9 +196,9 @@ public class PlayerController : MonoBehaviour
 
 	void OnCollisionEnter(Collision collision)
 	{
-		
+		CanJump = true;
 		var isEnemy = collision.gameObject.CompareTag("Monster");
-
+		StopCoroutine("FuelCountdown");
 		if (isEnemy)
 		{
 	//		ContactPoint contact = collision.contacts[0];
@@ -208,8 +223,10 @@ public class PlayerController : MonoBehaviour
 	//		}
 	//		else
 	//		{
-				StartCoroutine(Invul());
+			
+			StartCoroutine(Invul());
 			StartCoroutine(Blink(2f/15 ));
+			
 		}
 	}
 	//}

@@ -15,6 +15,9 @@ namespace Assets.JumpAndBomb
 		private Rigidbody rigidbody;
 		private bool _inAnimation;
 		public float JumpCd;
+		private ParticleSystem par;
+
+
 		public void Reverse()
 		{
 			Speed *= -1;
@@ -25,6 +28,7 @@ namespace Assets.JumpAndBomb
 		// Use this for initialization
 		void Start ()
 		{
+			par = GetComponent<ParticleSystem>();
 			_anim = GetComponent<Animator>();
 			rigidbody = GetComponent<Rigidbody>();
 			_inAnimation = false;
@@ -68,7 +72,13 @@ namespace Assets.JumpAndBomb
 		{
 			if (other.gameObject.CompareTag("Kill"))
 			{
-				Destroy(gameObject);
+				Rigidbody rig = other.GetComponentInParent<Rigidbody>();
+				rig.velocity	= new Vector3(rig.velocity.x, rig.velocity.y *-1);
+				
+
+				_anim.SetBool("IsDead", true);
+				par.Play();
+				//Destroy(gameObject);
 			}
 		}
 
