@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Monster
   - Kill
+  - Dead
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - Terrain
   - Monster
   - Invuln
-  - 
+  - Dead
   - 
   - 
   - 

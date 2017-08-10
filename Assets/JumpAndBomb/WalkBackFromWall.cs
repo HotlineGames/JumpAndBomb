@@ -7,13 +7,15 @@ namespace Assets.JumpAndBomb
 		void OnCollisionEnter(Collision collision)
 		{
 			var isTerrain = collision.gameObject.layer == LayerMask.NameToLayer("Terrain");
+			var isMonster = collision.gameObject.layer == LayerMask.NameToLayer("Monster");
 
-			if (isTerrain)
+			if (isTerrain || isMonster)
 			{
 				ContactPoint contact = collision.contacts[0];
-				if (contact.normal.y == 0.0f)
+				if (contact.normal.y <= 0.2f && contact.normal.y >= -0.2f)
 					GetComponent<IReversable>().Reverse();
 			}
+			
 		}
 
 	}

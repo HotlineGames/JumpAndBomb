@@ -16,7 +16,7 @@ namespace Assets.JumpAndBomb
 		private bool _inAnimation;
 		public float JumpCd;
 		private ParticleSystem par;
-
+		private CapsuleCollider caps;
 
 		public void Reverse()
 		{
@@ -28,6 +28,7 @@ namespace Assets.JumpAndBomb
 		// Use this for initialization
 		void Start ()
 		{
+			caps = GetComponent<CapsuleCollider>();
 			par = GetComponent<ParticleSystem>();
 			_anim = GetComponent<Animator>();
 			rigidbody = GetComponent<Rigidbody>();
@@ -74,11 +75,12 @@ namespace Assets.JumpAndBomb
 			{
 				Rigidbody rig = other.GetComponentInParent<Rigidbody>();
 				rig.velocity	= new Vector3(rig.velocity.x, rig.velocity.y *-1);
-				
-
 				_anim.SetBool("IsDead", true);
 				par.Play();
-				//Destroy(gameObject);
+				gameObject.layer = LayerMask.NameToLayer("Dead");
+				gameObject.tag = "Dead";
+				transform.localScale = new Vector3(50,10,90);
+				caps.radius *= 0.00001f;
 			}
 		}
 
