@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 	//Vector3 _playerMovementDirection;
 
 	private Rigidbody2D _rigidBody;
+	private Animator _anim;
 	public bool IsInvul;
 	public float JetPackFuel;
 	public int Life;
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour
 	// Use this for initialization
 	private void Start()
 	{
+		_anim = GetComponent<Animator>();
 		_rigidBody = GetComponent<Rigidbody2D>();
 		ChangeColor(Color.black);
 	}
@@ -30,6 +32,8 @@ public class PlayerController : MonoBehaviour
 	// Update is called once per frame
 	private void Update()
 	{
+		_anim.SetFloat("Speed", Math.Abs(_rigidBody.velocity.x));
+
 		var input = GetInput();
 
 		var desiredMove = new Vector3(input.x, input.y);
