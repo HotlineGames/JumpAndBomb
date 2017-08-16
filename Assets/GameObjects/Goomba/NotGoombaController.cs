@@ -12,11 +12,10 @@ namespace Assets.JumpAndBomb
 		private Animator _anim;
 		public float Speed;
 		public float JumpSpeed;
-		private Rigidbody rigidbody;
+		private Rigidbody2D rigidbody;
 		private bool _inAnimation;
 		public float JumpCd;
 		private ParticleSystem par;
-		private CapsuleCollider caps;
 
 		public void Reverse()
 		{
@@ -28,10 +27,9 @@ namespace Assets.JumpAndBomb
 		// Use this for initialization
 		void Start ()
 		{
-			caps = GetComponent<CapsuleCollider>();
 			par = GetComponent<ParticleSystem>();
 			_anim = GetComponent<Animator>();
-			rigidbody = GetComponent<Rigidbody>();
+			rigidbody = GetComponent<Rigidbody2D>();
 			_inAnimation = false;
 		}
 		// Update is called once per frame
@@ -69,28 +67,27 @@ namespace Assets.JumpAndBomb
 			_anim.SetBool("JumpAvailable", true);
 
 		}
-		void OnTriggerEnter(Collider other)
+		void OnTriggerEnter2D(Collider2D other)
 		{
 			if (other.gameObject.CompareTag("Kill"))
 			{
-				Rigidbody rig = other.GetComponentInParent<Rigidbody>();
+				var rig = other.GetComponentInParent<Rigidbody2D>();
 				rig.velocity	= new Vector3(rig.velocity.x, rig.velocity.y *-1);
 				_anim.SetBool("IsDead", true);
 				par.Play();
 				gameObject.layer = LayerMask.NameToLayer("Dead");
 				gameObject.tag = "Dead";
 				transform.localScale = new Vector3(50,10,90);
-				caps.radius *= 0.00001f;
 			}
 		}
 
-		void OnCollisionEnter(Collision collision)
+		void OnCollisionEnter2D(Collision2D collision)
 		{
 			var isTerrain = collision.gameObject.layer == LayerMask.NameToLayer("Terrain");
 
 			if (isTerrain)
 			{
-				ContactPoint contact = collision.contacts[0];
+				var contact = collision.contacts[0];
 				if (contact.normal.y == -1)
 				{
 					_anim.SetBool("Move", false);
