@@ -156,12 +156,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4196887455195412}
   - component: {fileID: 95500165645172216}
-  - component: {fileID: 54743949774461198}
-  - component: {fileID: 136866270605369104}
   - component: {fileID: 199970842801122030}
   - component: {fileID: 198535559496608484}
   - component: {fileID: 114984082640836822}
   - component: {fileID: 114960224343437580}
+  - component: {fileID: 50480836918213752}
+  - component: {fileID: 70704994141504080}
   m_Layer: 10
   m_Name: Goomba
   m_TagString: Monster
@@ -179,22 +179,6 @@ GameObject:
   - component: {fileID: 4197038420181124}
   m_Layer: 10
   m_Name: lFootJoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &1524103451826536
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4136589412804296}
-  - component: {fileID: 135406950462238992}
-  m_Layer: 0
-  m_Name: Collider 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -423,19 +407,6 @@ Transform:
   m_Father: {fileID: 4569677417351718}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 62.30403, y: -90, z: 0}
---- !u!4 &4136589412804296
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1524103451826536}
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 10}
-  m_LocalScale: {x: 0.020000003, y: 0.02, z: 0.020000003}
-  m_Children: []
-  m_Father: {fileID: 4196887455195412}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4168428559141414
 Transform:
   m_ObjectHideFlags: 1
@@ -472,12 +443,11 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1449418826118272}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 2.23, y: 0.589, z: 0}
+  m_LocalPosition: {x: -12.66, y: 1.74, z: -0}
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_Children:
   - {fileID: 4469853188219112}
   - {fileID: 4357053659624064}
-  - {fileID: 4136589412804296}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
@@ -572,7 +542,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1261805577061134}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.0011, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4196887455195412}
@@ -744,21 +714,41 @@ Transform:
   m_Father: {fileID: 4326782583456142}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &54743949774461198
-Rigidbody:
+--- !u!50 &50480836918213752
+Rigidbody2D:
+  serializedVersion: 4
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1449418826118272}
-  serializedVersion: 2
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
   m_Mass: 1
-  m_Drag: 0
+  m_LinearDrag: 0
   m_AngularDrag: 2
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
   m_Interpolate: 0
-  m_Constraints: 120
+  m_SleepingMode: 1
   m_CollisionDetection: 0
+  m_Constraints: 4
+--- !u!70 &70704994141504080
+CapsuleCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1449418826118272}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 7948, y: 0.008}
+  m_Size: {x: 0.0001, y: 0.016316937}
+  m_Direction: 1
 --- !u!95 &95500165645172216
 Animator:
   serializedVersion: 3
@@ -800,32 +790,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Speed: -5
   JumpSpeed: 5
-  JumpCd: 2
---- !u!135 &135406950462238992
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1524103451826536}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!136 &136866270605369104
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1449418826118272}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.01
-  m_Height: 0.01
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.01, z: 0}
+  JumpCd: 100000000
 --- !u!137 &137719651016093364
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -941,7 +906,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 2
-  randomSeed: -1181180
+  randomSeed: -1422602300
   InitialModule:
     serializedVersion: 3
     enabled: 1
