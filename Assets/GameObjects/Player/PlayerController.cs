@@ -20,13 +20,18 @@ public class PlayerController : MonoBehaviour
 	public float JumpForce;
 	public bool IsJumping;
 	public float Gravity;
+	private Shader _blinkShader;
+	private Shader _normalShader;
+	private float _currentDirection;
 
 	// Use this for initialization
 	private void Start()
 	{
 		_anim = GetComponent<Animator>();
 		_rigidBody = GetComponent<Rigidbody2D>();
-		ChangeColor(Color.black);
+		_blinkShader = Shader.Find("FX/Flare");
+		_normalShader = Shader.Find("Mobile/Bumped Diffuse");
+		ChangeShader(_normalShader);
 	}
 
 	// Update is called once per frame
@@ -40,6 +45,16 @@ public class PlayerController : MonoBehaviour
 		var anyInput = Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon;
 		var pressesUp = desiredMove.y > 0;
 		var hasJetPackFuel = JetPackFuel > float.Epsilon;
+		if (anyInput)
+		{
+			if (_currentDirection != input.x)
+			{
+				Rotate();
+			}
+			_currentDirection = input.x;
+			
+		}
+
 
 		var velocity = _rigidBody.velocity;
 		if (anyInput)
@@ -120,7 +135,12 @@ public class PlayerController : MonoBehaviour
 		return input;
 	}
 
-
+	private void Rotate()
+	{
+		//does not work -.- boxcollider increases in size
+		transform.Rotate(0,180,0);
+	}
+	
 	private void ChangeLayer(string layer)
 	{
 		gameObject.layer = LayerMask.NameToLayer(layer);
@@ -129,9 +149,10 @@ public class PlayerController : MonoBehaviour
 			child.gameObject.layer = LayerMask.NameToLayer(layer);
 	}
 
-	private void ChangeColor(Color color)
+	private void ChangeShader(Shader shade)
 	{
-		gameObject.GetComponent<MeshRenderer>().sharedMaterial.color = color;
+		GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial.shader = shade;
+		//gameObject.GetComponent<MeshRenderer>().sharedMaterial.color = color;
 	}
 
 	private IEnumerator Invul()
@@ -139,7 +160,7 @@ public class PlayerController : MonoBehaviour
 		Life -= 1;
 		if (Life <= 0)
 		{
-			ChangeColor(Color.red);
+			ChangeShader(_blinkShader);
 			SceneManager.LoadScene("GameOver");
 		}
 		IsInvul = true;
@@ -155,9 +176,9 @@ public class PlayerController : MonoBehaviour
 	{
 		for (var i = 0; i < 20; i++)
 		{
-			ChangeColor(Color.black);
+			ChangeShader(_blinkShader);
 			yield return new WaitForSeconds(interval / 2);
-			ChangeColor(Color.white);
+			ChangeShader(_normalShader);
 			yield return new WaitForSeconds(interval / 2);
 		}
 	}
